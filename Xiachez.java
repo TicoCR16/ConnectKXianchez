@@ -7,7 +7,7 @@ import connectK.BoardModel;
 public class Xiachez extends CKPlayer {
 	private final byte PLAYER_1 = 1;
 	private final byte PLAYER_2 = 2;
-	private final int DEPTH_MAX = 5;
+	private final int DEPTH_MAX = 2;
 	private final int P_INF = Integer.MAX_VALUE;
 	private final int N_INF = Integer.MIN_VALUE;
 	
@@ -35,10 +35,11 @@ public class Xiachez extends CKPlayer {
 	
 	//Simulates Minimax algorithm
 	public Point minimax( BoardModel state ) {
-		int value = Integer.MIN_VALUE;
 		Point action = null;
+		int value = Integer.MIN_VALUE;
+		int temp = heuristicFunction( state, 0 );
 		for( Point cell : possibleMoves( state ) ) {
-			int temp = depthScore( state.placePiece( cell, PLAYER_2 ), 0, 0, N_INF, P_INF );
+			temp = depthScore( state.placePiece( cell, PLAYER_2 ), 0, value, N_INF, P_INF );
 			if( value < temp ) {
 				value = temp;
 				action = cell;
@@ -59,12 +60,20 @@ public class Xiachez extends CKPlayer {
         	if( depth % 2 == 0 ) {
         		returnValue = Math.min( beta, depthScore( state.placePiece( cell, PLAYER_1 ),
         			          depth + 1, heuristicFunction( state, score ), alpha, beta ) );
-        		if( returnValue <= alpha ) break;
+        		if( returnValue <= alpha ) 
+        		{
+        			beta = returnValue;
+        			break;
+        		}
         	}
         	else {
         		returnValue = Math.max( alpha, depthScore( state.placePiece( cell,  PLAYER_2 ),
         				      depth + 1, heuristicFunction( state, score ), alpha, beta ) ); 
-        		if( beta <= returnValue ) break;	
+        		if( beta <= returnValue )
+        		{
+        			alpha = returnValue;
+        			break;	
+        		}
         	}
         }
         return returnValue;  
